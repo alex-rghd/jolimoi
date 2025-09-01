@@ -4,9 +4,9 @@
     "target": "es2020",
     "module": "commonjs",
     "outDir": "./dist",
-    "rootDir": "./src/",
+    "rootDir": "./",
     "strict": true,
     "esModuleInterop": true
   },
-  "exclude": ["tests"]
+  // "exclude": ["tests"]
 }
