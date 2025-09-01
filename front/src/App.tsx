@@ -1,5 +1,6 @@
 import { useState } from "react";
 import "./App.css";
+import DisplayError from "./components/display-error";
 
 interface ApiResponse {
   data?: string;
@@ -74,11 +75,7 @@ function App() {
         </button>
       </form>
 
-      {error && (
-        <div className="max-w-sm mx-auto mt-10 text-center">
-          <p className="text-red-600">{error}</p>
-        </div>
-      )}
+      <DisplayError error={error} />
 
       {response && (
         <div className="max-w-sm mx-auto mt-10 text-center">
