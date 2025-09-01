@@ -5,5 +5,13 @@ POST {{baseUrl}}/roman/convert
 Content-Type: application/json
 
 {
-  "number": 17
+  "number": 170
+}
+
+### Test 2: Error, number bigger than 100
+POST {{baseUrl}}/roman/convert
+Content-Type: application/json
+
+{
+  "number": 170
 }

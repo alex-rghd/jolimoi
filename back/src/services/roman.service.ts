@@ -1,6 +1,6 @@
 export const toRomanService = (num: number): string => {
   if (!Number.isInteger(num) || num < 1 || num > 100) {
-    throw new Error("Le nombre doit être un entier entre 1 et 100");
+    throw new Error("The number must be between 1 and 100.");
   }
 
   const romanNumerals: Array<[number, string]> = [

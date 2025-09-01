@@ -3,7 +3,7 @@ import { toRomanService } from "../services/roman.service";
 
 interface ApiResponse {
   // success: boolean;
-  data: any;
+  data: string;
   // message?: string;
 }
 
@@ -29,10 +29,12 @@ export const convertToRoman = async (
 
     return res.status(200).json({
       // success: true,
-      data: {
-        number: number,
-        roman: romanNumeral,
-      },
+      // data: {
+      //   number: number,
+      //   roman: romanNumeral,
+      // },
+      data: romanNumeral,
+
       // message: `${number} converti en ${romanNumeral} avec succès`,
     });
   } catch (error) {
