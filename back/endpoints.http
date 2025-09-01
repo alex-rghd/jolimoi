@@ -1,0 +1,9 @@
+@baseUrl = http://localhost:3001
+
+### Test 1: Convert number to roman number
+POST {{baseUrl}}/roman/convert
+Content-Type: application/json
+
+{
+  "number": 17
+}
