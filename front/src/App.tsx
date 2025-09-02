@@ -1,6 +1,7 @@
-import { useState } from "react";
+import React, { useState } from "react";
 import "./App.css";
 import DisplayError from "./components/display-error";
+import { v4 as uuidv4 } from "uuid";
 
 interface ApiResponse {
   data?: string;
@@ -9,17 +10,29 @@ interface ApiResponse {
 function App() {
   const [inputValue, setInputValue] = useState<number | "">("");
   const [loading, setLoading] = useState<boolean>(false);
-  const [response, setResponse] = useState<ApiResponse | null>(null);
+  const [response, setResponse] = useState<ApiResponse | null>();
   const [error, setError] = useState<string | null>(null);
 
-  const callApi = async () => {
-    setResponse(null);
-    setError(null);
-    if (inputValue === "" || inputValue < 1 || inputValue > 100) {
-      setError("The number must be between 1 and 100.");
-    }
-
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
     setLoading(true);
+    setError(null);
+
+    const connectionId = uuidv4();
+
+    const eventSource = new EventSource(
+      `http://localhost:3001/roman/events?connectionId=${connectionId}`
+    );
+
+    eventSource.onmessage = (event) => {
+      const parsed = JSON.parse(event.data);
+      setResponse(parsed);
+    };
+
+    eventSource.onerror = () => {
+      eventSource.close();
+      setLoading(false);
+    };
 
     try {
       const res = await fetch("http://localhost:3001/roman/convert", {
@@ -27,19 +40,23 @@ function App() {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ number: inputValue }),
+        body: JSON.stringify({
+          number: inputValue,
+          connectionId: connectionId,
+        }),
       });
 
       if (!res.ok) {
         const errorData = await res.json();
         setError(errorData.data);
+        setResponse(null);
+        eventSource.close();
         return;
       }
-
-      const data: ApiResponse = await res.json();
-      setResponse(data);
     } catch {
       setError("API Error");
+      setLoading(false);
+      eventSource.close();
     } finally {
       setLoading(false);
     }
@@ -48,7 +65,7 @@ function App() {
   return (
     <>
       <h1 className="text-center text-3xl py-6 font-bold">Jolimoi</h1>
-      <form className="max-w-sm mx-auto mt-10">
+      <form className="max-w-sm mx-auto mt-10" onSubmit={handleSubmit}>
         <label
           htmlFor="inputValue"
           className={`block font-semibold mb-2 ${error && "text-red-500"}`}
@@ -67,7 +84,6 @@ function App() {
         />
         <button
           type="submit"
-          onClick={callApi}
           disabled={loading || inputValue === ""}
           className="w-full bg-blue-600 text-white font-semibold py-2 px-4 rounded hover:bg-blue-700 transition duration-200"
         >

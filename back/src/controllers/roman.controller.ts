@@ -36,8 +36,8 @@ export const convertToRoman = async (
       const romanNumeral = toRomanService(number);
       resSSE.write(`data: ${JSON.stringify({ data: romanNumeral })}\n\n`);
 
-      resSSE.end(); // 🔒 Fermeture propre de la connexion SSE
-      connections.delete(connectionId); // Nettoyage
+      resSSE.end();
+      connections.delete(connectionId); 
     }, 1000);
 
     timer.unref();
@@ -52,7 +52,7 @@ export const convertToRoman = async (
   }
 };
 
-export const convertToRomanEventV2 = (req: Request, res: Response) => {
+export const convertToRomanEvent = (req: Request, res: Response) => {
   const connectionId = req.query.connectionId as string;
   if (!connectionId) {
     return res.status(400).send("Missing client id");
@@ -65,29 +65,14 @@ export const convertToRomanEventV2 = (req: Request, res: Response) => {
     "Access-Control-Allow-Origin": "*",
   });
 
-  sseService.sendMessage(connectionId, "Converting ...");
   sseService.addConnection(connectionId, res);
+  sseService.sendMessage(connectionId, "Converting ...");
+  connections.set(connectionId, res);
 
   const cleanup = () => sseService.removeConnection(connectionId);
-
-  connections.set(connectionId, res);
 
   req.on("close", cleanup);
   req.on("error", cleanup);
   res.on("error", cleanup);
 
-  // req.on("close", () => {
-  //   // console.log(`Connectionnnn ${connectionId} closed by client`);
-  //   connections.delete(connectionId);
-  // });
-
-  // req.on("error", (error) => {
-  //   // console.error(`Connection error!!! ${connectionId} error:`, error);
-  //   connections.delete(connectionId);
-  // });
-
-  // res.on("error", (error) => {
-  //   // console.error(`Response ${connectionId} error:`, error);
-  //   connections.delete(connectionId);
-  // });
 };

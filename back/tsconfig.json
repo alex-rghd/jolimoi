@@ -8,5 +8,5 @@
     "strict": true,
     "esModuleInterop": true
   },
-  // "exclude": ["tests"]
+  "exclude": ["node_modules", "**/*.test.ts", "**/*.spec.ts"]
 }
